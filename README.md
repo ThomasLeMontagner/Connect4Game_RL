@@ -5,7 +5,6 @@ Connect Four is a two-player strategy game in which players take turns dropping 
 
 This `README.md` file provides a brief description of the Connect4 game, as well as instructions for installing the required packages, running the game from the command line, playing against an AI opponent, and starting the web API.
 
-I hope this helps! Let me know if you have any other questions.
 
 ## Requirements
 
