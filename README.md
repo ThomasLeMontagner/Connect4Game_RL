@@ -1,4 +1,4 @@
-# Connect Four
+# Connect4Game
 
 Connect Four is a two-player strategy game in which players take turns dropping colored discs from the top into a grid. The goal is to get four of your discs in a row (horizontally, vertically, or diagonally) before your opponent does.
 
