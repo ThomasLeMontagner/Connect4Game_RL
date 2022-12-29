@@ -3,7 +3,7 @@
 Connect Four is a two-player strategy game in which players take turns dropping colored discs from the top into a grid. The goal is to get four of your discs in a row (horizontally, vertically, or diagonally) before your opponent does.
 
 
-This `README.md` file provides a brief description of the Connect Four game, as well as instructions for installing the required packages, running the game from the command line, playing against an AI opponent, and starting the web API. It also includes a license section.
+This `README.md` file provides a brief description of the Connect4 game, as well as instructions for installing the required packages, running the game from the command line, playing against an AI opponent, and starting the web API.
 
 I hope this helps! Let me know if you have any other questions.
 
