@@ -10,15 +10,16 @@ class TestConnectFour(unittest.TestCase):
 
     def test_make_move(self):
         game = ConnectFour(0)
-        self.assertEqual(game.player.color, RED)
-        column = 3
-        game.make_move(column, 1)
         board = np.zeros((ROWS, COLUMNS), dtype=int)
+        self.assertEqual(game.current_player.color, RED)
+        column = 3
+
+        game.make_move(column, color=1)
         board[ROWS-1][column] = 1
         np.testing.assert_array_equal(game.board, board)
 
-        game.make_move(column, -1)
-        board[ROWS-2][column] = -1
+        game.make_move(column, color=2)
+        board[ROWS-2][column] = 2
         np.testing.assert_array_equal(game.board, board)
 
     def test_invalid_column_range(self):

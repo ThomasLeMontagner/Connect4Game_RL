@@ -1,6 +1,8 @@
 import math
 import numpy as np
 import random
+from minimax import *
+from game import *
 
 
 class AgentInterface:
@@ -24,6 +26,7 @@ class HumanAgent(AgentInterface):
 
 class ComputerAgentRandom(AgentInterface):
     """Computer Agent playing randomly."""
+
     def __init__(self, color):
         super().__init__(color)
 
@@ -35,98 +38,38 @@ class ComputerAgentRandom(AgentInterface):
 
 class ComputerAgentMinimax(AgentInterface):
     """Computer Agent using minimax method to play."""
+
     def __init__(self, color):
         super().__init__(color)
 
     def get_move(self, game):
         """Determine the next move for the computer player using the minimax algorithm."""
 
-        def minimax(game, depth, maximizing_player):
-            """Recursive function to determine the best move using minimax."""
-            if game.check_winner() or depth == 0:
-                # return a heuristic score for the current board state
-                return self.evaluate_board()
-            if maximizing_player:
-                best_score = -math.inf
-                for column in range(7):
-                    try:
-                        game.make_move(column, self.color)
-                    except ValueError:
-                        continue
-                    score = minimax(game, depth - 1, False)
-                    game.undo_move(column)
-                    best_score = max(best_score, score)
-                return best_score
+        maxUtility = -math.inf
+        nextMove = -1
+        # startTime = time.clock()
+
+        for col in range(COLUMNS):
+            if game.is_column_valid(col):
+                # print("MOVE: ", col)
+                child = deepcopy(game)
+                child.make_move(col, game.current_player.color)
             else:
-                best_score = math.inf
-                for column in range(7):
-                    try:
-                        if self.color == -1:
-                            game.make_move(column, 1)
-                        else:
-                            game.make_move(column, -1)
-                    except ValueError:
-                        continue
-                    score = minimax(game, depth - 1, True)
-                    self.undo_move(column)
-                    best_score = min(best_score, score)
-                return best_score
-        def evaluate_board(self):
-            """Evaluate the current board state and return a heuristic score."""
-            # define some constants for the heuristic evaluation
-            SINGLE_THREAT_SCORE = 10
-            DOUBLE_THREAT_SCORE = 100
-            TRIPLE_THREAT_SCORE = 1000
-            FOUR_IN_A_ROW_SCORE = 10000
-
-            score = 0
-            # check for horizontal threats
-            for row in range(6):
-                for col in range(4):
-                    if self.board[row][col] == self.board[row][col + 1] == self.board[row][col + 2] == self.player and self.board[row][col + 3] == ' ':
-                        score += SINGLE_THREAT_SCORE
-                    if self.board[row][col] == ' ' and self.board[row][col + 1] == self.player and self.board[row][
-                        col + 2] == self.player and self.board[row][col + 3] == self.player:
-                        score += SINGLE_THREAT_SCORE
-                    if self.board[row][col] == self.player and self.board[row][col + 1] == ' ' and self.board[row][
-                        col + 2] == self.player and self.board[row][col + 3] == self.player:
-                        score += SINGLE_THREAT_SCORE
-                    if self.board[row][col] == self.player and self.board[row][col + 1] == self.player and self.board[row][
-                        col + 2] == ' ' and self.board[row][col + 3] == self.player:
-                        score += SINGLE_THREAT_SCORE
-                    if self.board[row][col] == self.player and self.board[row][col + 1] == self.player and self.board[row][
-                        col + 2] == self.player and self.board[row][col + 3] == self.player:
-                        score += FOUR_IN_A_ROW_SCORE
-                # check for vertical threats
-                for row in range(3):
-                    for col in range(7):
-                        if self.board[row][col] == self.player and self.board[row + 1][col] == self.player and \
-                                self.board[row + 2][col] == self.player and self.board[row + 3][col] == ' ':
-                            score += SINGLE_THREAT_SCORE
-                        if self.board[row][col] == ' ' and self.board[row + 1][col] == self.player and self.board[row + 2][
-                            col] == self.player and self.board[row + 3][col] == self.player:
-                            score += SINGLE_THREAT_SCORE
-                        # if self.board[row][col] == self.player and self.board[row+1][col] == ' ' and self.board[row+2][col] == self.player and self.board[row+3][col] == self.player:
-                        #    score += SINGLE_THREAT_SCORE
-                        ### TO BE CONTINUED...
-
-        best_score = -math.inf
-        best_column = None
-        for column in range(7):
-            try:
-                self.make_move(column)
-            except ValueError:
                 continue
-            score = minimax(self.board, 6, False)
-            self.undo_move(column)
-            if score > best_score:
-                best_score = score
-                best_column = column
-        return best_column
+
+            utility = decision(child)
+            # print("utility: ", utility)
+            if utility >= maxUtility:
+                maxUtility = utility
+                nextMove = col
+        # endTime = time.clock()
+        # print("Time: ", endTime - startTime)
+        return nextMove
 
 
 class ComputerAgentQLearning(AgentInterface):
     """Computer Agent using Q-Learning method to play;"""
+
     def __init__(self, alpha=0.1, discount_factor=0.9):
         self.alpha = alpha
         self.discount_factor = discount_factor
@@ -162,6 +105,7 @@ class ComputerAgentQLearning(AgentInterface):
                 best_action = action
         return best_action
 
+
 class Node:
     def __init__(self, parent=None, action=None, state=None):
         self.parent = parent
@@ -183,7 +127,8 @@ class Node:
     def ucb(self, c=1.4142):
         if self.parent is None:
             return float('inf')
-        return self.wins / self.visits + c * (2 * np.log(self.parent.visits) / self.visits)**0.5
+        return self.wins / self.visits + c * (2 * np.log(self.parent.visits) / self.visits) ** 0.5
+
 
 def monte_carlo_tree_search(game, iterations):
     root = Node(state=game.board)
@@ -208,11 +153,12 @@ def monte_carlo_tree_search(game, iterations):
             node = node.parent
     return max(root.children, key=lambda x: x.visits).action
 
+
 class ComputerAgentMCTS(AgentInterface):
     """Computer Agent using Monte-Carlo Tree Search to play."""
+
     def __init__(self, iterations=1000):
         self.iterations = iterations
 
     def choose_move(self, game):
         return monte_carlo_tree_search(game, self.iterations)
-
