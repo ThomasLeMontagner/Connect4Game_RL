@@ -10,6 +10,7 @@ COLUMNS = 7
 RED = 1
 YELLOW = 2
 
+
 class ConnectFour:
     def __init__(self, mode):
         self.board = np.zeros((ROWS, COLUMNS), dtype=int)  # initialize board with empty 0s
@@ -29,8 +30,10 @@ class ConnectFour:
     def is_column_valid(self, column):
         """Check the validity of the column to make a move."""
         if not column in range(0, COLUMNS):
+            print(f"The column is out of range. It should be between 0 and {COLUMNS - 1}")
             return False
         if self.board[0][column] != 0:
+            print("Invalid move: column is full")
             return False
         else:
             return True
@@ -47,7 +50,7 @@ class ConnectFour:
     def undo_move(self, column):
         for row in range(ROWS):
             if self.board[row][column] != 0:
-                self.board[row][column] == 0
+                self.board[row][column] = 0
                 break
         else:
             raise ValueError("Invalid move: column is already empty")
@@ -116,7 +119,6 @@ class ConnectFour:
 
 
 def main():
-    print(a == b == b)
     mode = input("Enter '0' for computer against computer, '1' to play against the computer, '2' to play against "
                  "another player: ")
     if mode == '0' or mode == '1' or mode == '2':
