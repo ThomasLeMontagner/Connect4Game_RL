@@ -1,6 +1,7 @@
 import time
 from copy import deepcopy
-from game import *
+import numpy as np
+from src.constants import *
 import math
 
 max_depth = 4 # maximum authorized depth
@@ -71,8 +72,6 @@ def decision(game):
 
 def evaluate_board(game):
     """Evaluate the current board state and return a heuristic score."""
-
-
     score = 0
     player_color = game.current_player.color
     adverse_color = RED

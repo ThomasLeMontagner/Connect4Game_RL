@@ -1,6 +1,5 @@
 import unittest
-from minimax import *
-from game import *
+from src.game import *
 
 
 class TestMinimax(unittest.TestCase):

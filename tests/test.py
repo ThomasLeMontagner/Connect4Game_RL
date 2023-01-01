@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from game import *
+from src.game import *
 
 class TestConnectFour(unittest.TestCase):
     def test_init_game(self):
