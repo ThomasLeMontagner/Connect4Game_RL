@@ -3,11 +3,12 @@ import numpy as np
 import random
 from src.minimax import *
 
+
 class AgentInterface:
     def __init__(self, color):
         self.color = color
 
-    def get_move(self, board):
+    def get_move(self, game, actions):
         """Determine the next move for the computer player"""
         pass
 
@@ -16,9 +17,9 @@ class HumanAgent(AgentInterface):
     def __init__(self, color):
         super().__init__(color)
 
-    def get_move(self, board):
+    def get_move(self, game, actions):
         """Determine the next ove of the player by asking which column to play."""
-        column = int(input("Enter column number (0-6): "))
+        column = int(input(f"Enter column number among {actions}: "))
         return column
 
 
@@ -28,9 +29,9 @@ class ComputerAgentRandom(AgentInterface):
     def __init__(self, color):
         super().__init__(color)
 
-    def get_move(self, board):
+    def get_move(self, game, actions):
         """Determine the next move for the computer player using a random strategy."""
-        column = random.randint(0, 6)
+        column = random.choice(actions)
         return column
 
 
@@ -40,87 +41,17 @@ class ComputerAgentMinimax(AgentInterface):
     def __init__(self, color):
         super().__init__(color)
 
-    def get_move(self, game):
+    def get_move(self, game, actions):
         """Determine the next move for the computer player using the minimax algorithm."""
 
         maxUtility = -math.inf
         nextMove = -1
         # startTime = time.clock()
 
-        for col in range(game.COLUMNS):
-            if game.is_column_valid(col):
-                # print("MOVE: ", col)
-                child = deepcopy(game)
-                child.make_move(col, game.current_player.color)
-            else:
-                continue
-
-            utility = decision(child)
-            # print("utility: ", utility)
-            if utility >= maxUtility:
-                maxUtility = utility
-                nextMove = col
-        # endTime = time.clock()
-        # print("Time: ", endTime - startTime)
-        return nextMove
-
-
-class AgentInterface:
-    def __init__(self, color):
-        self.color = color
-
-    def get_move(self, board):
-        """Determine the next move for the computer player"""
-        pass
-
-
-class HumanAgent(AgentInterface):
-    def __init__(self, color):
-        super().__init__(color)
-
-    def get_move(self, board):
-        """Determine the next ove of the player by asking which column to play."""
-        column = int(input("Enter column number (0-6): "))
-        return column
-
-
-class ComputerAgentRandom(AgentInterface):
-    """Computer Agent playing randomly."""
-
-    def __init__(self, color):
-        super().__init__(color)
-
-    def get_move(self, game):
-        """Determine the next move for the computer player using a random strategy."""
-        column = -1
-        while True:
-            column = random.randint(0, 6)
-            if game.is_column_valid(column):
-                break
-        return column
-
-
-class ComputerAgentMinimax(AgentInterface):
-    """Computer Agent using minimax method to play."""
-
-    def __init__(self, color):
-        super().__init__(color)
-
-    def get_move(self, game):
-        """Determine the next move for the computer player using the minimax algorithm."""
-
-        maxUtility = -math.inf
-        nextMove = -1
-        # startTime = time.clock()
-
-        for col in range(7):
-            if game.is_column_valid(col):
-                # print("MOVE: ", col)
-                child = deepcopy(game)
-                child.make_move(col, game.current_player.color)
-            else:
-                continue
-
+        for col in actions:
+            # print("MOVE: ", col)
+            child = deepcopy(game)
+            child.make_move(col, game.current_player.color)
             utility = decision(child)
             # print("utility: ", utility)
             if utility >= maxUtility:
@@ -134,49 +65,49 @@ class ComputerAgentMinimax(AgentInterface):
 class ComputerAgentQLearning(AgentInterface):
     """Computer Agent using Q-Learning method to play;"""
 
-    def __init__(self, color, alpha=0.1, epsilon=0.1, discount=0.9):
+    def __init__(self, color, alpha=0.1, epsilon=0.1, gamma=0.9):
         self.alpha = alpha  # Learning rate
         self.epsilon = epsilon  # Exploration rate
-        self.discount = discount  # Discount factor
-        self.q_table = np.zeros((6, 7, 2))  # Q-table for each (state, action) pair
-        self.prev_board = None  # Previous game state
-        self.prev_player = None  # Previous player color
+        self.gamma = gamma  # Discount factor
+        self.q_table = {} # np.zeros((6, 7, 2))  # Q-table for each (state, action) pair
+        # self.prev_board = None  # Previous game state
+        # self.prev_player = None  # Previous player color
         self.color = color
 
-    def get_move(self, board, player):
-        """This method returns the next move for the QPlayer. It takes in the current game state (board) and the \
+    def getQ(self, state, action):
+        """
+        Return a probability for a given state and action where the greater
+        the probability the better the move
+        """
+        # encourage exploration; "optimistic" 1.0 initial values
+        if self.q_table.get((state, action)) is None:
+            self.q_table[(state, action)] = 1.0
+        return self.q_table.get((state, action))
+
+    def get_move(self, game, actions):
+        """
+        This method returns the next move for the QPlayer. It takes in the current game state (board) and the \
         current player's color (player) as arguments. If this is the first move of the game, it returns a random \
         move. Otherwise, it either explores (takes a random action) or exploits (chooses the action with the highest \
-        expected reward) based on the exploration rate (epsilon)."""
-        # Check if this is the first move
-        if self.prev_board is None:
-            self.prev_board = board
-            self.prev_player = player
-            return np.random.randint(0, COLUMNS)  # Return a random move
+        expected reward) based on the exploration rate (epsilon).
+        """
+        current_state = game.get_state()
 
-        # Check if we should explore (take a random action) or exploit (choose the best action)
-        if np.random.random() < self.epsilon:
-            return np.random.randint(0, COLUMNS)  # Return a random move
+        if random.random() < self.epsilon: # explore!
+            chosen_action = random.choice(actions)
+            return chosen_action
+
+        qs = [self.getQ(current_state, a) for a in actions]
+        maxQ = max(qs)
+
+        if qs.count(maxQ) > 1:
+            # more than 1 best option; choose among them randomly
+            best_options = [i for i in range(len(actions)) if qs[i] == maxQ]
+            i = random.choice(best_options)
         else:
-            # Choose the action with the highest expected reward
-            q_values = self.q_table[:, :, player]  # Get the Q-values for the current player
-            max_q = np.max(q_values)  # Find the maximum Q-value
-            best_actions = np.argwhere(q_values == max_q)  # Find all actions with the maximum Q-value
-            action = np.random.choice(best_actions)  # Choose one of the best actions at random
-            return action
+            i = qs.index(maxQ)
 
-    def update(self, reward, board, player):
-        """This method updates the Q-table based on the reward received from the previous move and the current game \
-        state. It takes in the reward (reward), the current game state (board), and the current player's color (player)\
-        as arguments. It updates the Q-value for the previous state and action pair using the reward received and the\
-         maximum Q-value, and updates the previous board and player to the current board and player."""
-        # Update the Q-table
-        q_values = self.q_table[:, :, self.prev_player]  # Get the Q-values for the previous player
-        max_q = np.max(q_values)  # Find the maximum Q-value
-        q_values[self.prev_board == self.prev_player] = reward + self.discount * max_q  # Update the Q-value
-
-        # Update the previous state and player
-        self.prev_board = board
+        return actions[i]
 
 
 class Node:

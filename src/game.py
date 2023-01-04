@@ -4,6 +4,7 @@ from src.constants import *
 class ConnectFour:
     def __init__(self, mode):
         self.board = np.zeros((ROWS, COLUMNS), dtype=int)  # initialize board with empty 0s
+        self.previous_state = None
         self.mode = mode
 
         if mode == '0':  # computer vs computer
@@ -85,15 +86,40 @@ class ConnectFour:
         """Check if the game is over (either because a player has won or the board is full)."""
         return self.check_winner() or all(self.board[0])
 
+    def get_possible_moves(self):
+        """Return list of non-full columns."""
+        return [i for i in range(COLUMNS) if self.board[0][i] == 0]
+
+    def get_state(self):
+        """
+        Return the 2d list numerical representation of the board
+        """
+        result = tuple(tuple(x) for x in self.board)
+
+        return result
+
+    def get_prev_state(self):
+        """
+        Return the previous state of the board
+        """
+        result = tuple(tuple(x) for x in self.previous_state)
+
+        return result
+
     def play(self):
         while not self.game_over():
             self.display_board()
-            column = self.current_player.get_move(self)
-            print(f"Player is playing column {column}")
+            possible_moves = self.get_possible_moves()
+            column = self.current_player.get_move(self, possible_moves)
+            print(f"Player {self.current_player} is playing column {column}")
+
             while not self.is_column_valid(column):
                 print('column invalid.')
-                column = self.current_player.get_move(self)
+                column = self.current_player.get_move(self, possible_moves)
+
+            self.previous_state = deepcopy(self.board)
             self.make_move(column, self.current_player.color)
+
             if self.check_winner():
                 self.display_board()
                 print(f"Player {self.current_player.color} wins!")
