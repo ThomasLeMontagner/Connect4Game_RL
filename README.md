@@ -29,7 +29,7 @@ python game.py
 You will be able to choose different modes: <br>
   * '0' for computer against computer
   * '1' for 1 human player against computer
-  * '2' for 2 humans agaisnt each other <br>
+  * '2' for 2 humans against each other <br>
   
 Then the board is displayed in the terminal.
 
