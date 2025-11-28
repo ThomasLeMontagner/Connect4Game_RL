@@ -1,3 +1,5 @@
+"""Generate random training data for Connect Four states."""
+
 from __future__ import annotations
 
 import random

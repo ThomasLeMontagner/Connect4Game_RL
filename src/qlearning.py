@@ -1,3 +1,5 @@
+"""Train a Q-learning agent through self-play in Connect Four."""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -8,6 +10,7 @@ from game import *
 
 
 def train_qlearing_agent() -> None:
+    """Run a training loop for the Q-learning agent against a baseline opponent."""
     qplayer = ComputerAgentQLearning(color=1)  # Initialize the QPlayer object
     opponentPlayer = ComputerAgentRandom(2) # ComputerAgentMinimax(2)
 

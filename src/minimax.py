@@ -1,3 +1,5 @@
+"""Minimax search with heuristic evaluation for Connect Four."""
+
 from __future__ import annotations
 
 import time
@@ -19,6 +21,7 @@ THREE_IN_A_ROW_SCORE = 1000
 FOUR_IN_A_ROW_SCORE = 10000
 
 def minimize(game: ConnectFour, current_depth: int, alpha: float, beta: float) -> float:
+    """Minimize the evaluation score for the opponent using alpha-beta pruning."""
     #print(" -- minimize --")
     if game.check_winner() or current_depth == 0:
         # return a heuristic score for the current board state
@@ -43,6 +46,7 @@ def minimize(game: ConnectFour, current_depth: int, alpha: float, beta: float) -
 
 
 def maximize(game: ConnectFour, current_depth: int, alpha: float, beta: float) -> float:
+    """Maximize the evaluation score for the current player using alpha-beta pruning."""
     #print(" -- maximize --")
     if game.check_winner() or current_depth == 0:
         # return a heuristic score for the current board state
@@ -72,6 +76,7 @@ def maximize(game: ConnectFour, current_depth: int, alpha: float, beta: float) -
 
 
 def decision(game: ConnectFour) -> float:
+    """Compute the minimax value for the current game state."""
     # start = time.clock()
     return minimize(game, 0, -math.inf, math.inf)
 
@@ -107,6 +112,7 @@ def evaluate_board(game: ConnectFour) -> float:
 
 
 def count_diagonal_score(game: ConnectFour, color: int) -> int:
+    """Count heuristic score contributions along diagonals."""
     score = 0
     # from top left to bottom right
     for col in range(COLUMNS - 4 + 1):
@@ -123,6 +129,7 @@ def count_diagonal_score(game: ConnectFour, color: int) -> int:
 
 
 def count_vertical_score(game: ConnectFour, color: int) -> int:
+    """Count heuristic score contributions along columns."""
     score = 0
     for col in range(COLUMNS):
         column = game.board[:, col]
@@ -133,6 +140,7 @@ def count_vertical_score(game: ConnectFour, color: int) -> int:
 
 
 def count_horizontal_score(game: ConnectFour, color: int) -> int:
+    """Count heuristic score contributions along rows."""
     score = 0
     for row in range(ROWS):
         r = game.board[row, :]
@@ -143,6 +151,7 @@ def count_horizontal_score(game: ConnectFour, color: int) -> int:
 
 
 def add_scores(color: int, sub: np.ndarray) -> int:
+    """Compute heuristic value for a four-slot segment."""
     score = 0
     if np.count_nonzero(sub == color) == 2 and np.count_nonzero(sub == 0) == 2:
         score += TWO_IN_A_ROW_SCORE
@@ -154,6 +163,7 @@ def add_scores(color: int, sub: np.ndarray) -> int:
 
 
 def get_next_games(game: ConnectFour) -> list[ConnectFour]:
+    """Generate new game states for each valid move."""
     games: list[ConnectFour] = []
     for col in range(COLUMNS):
         if game.is_column_valid(col):
@@ -162,4 +172,3 @@ def get_next_games(game: ConnectFour) -> list[ConnectFour]:
             game.switch_players()
             games.append(new_game)
     return games
-

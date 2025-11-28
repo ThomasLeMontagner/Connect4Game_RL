@@ -1,3 +1,5 @@
+"""Shared constants for the Connect Four board and players."""
+
 from __future__ import annotations
 
 # Constants for the game board

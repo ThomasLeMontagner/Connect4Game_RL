@@ -1,3 +1,5 @@
+"""Game logic and play loop for Connect Four."""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -7,7 +9,10 @@ from src.agent import *
 from src.constants import *
 
 class ConnectFour:
+    """Game engine orchestrating Connect Four matches."""
+
     def __init__(self, mode: str) -> None:
+        """Set up the board, selected mode, and player instances."""
         self.board: np.ndarray = np.zeros((ROWS, COLUMNS), dtype=int)  # initialize board with empty 0s
         self.previous_state: tuple[tuple[int, ...], ...] | None = None
         self.mode: str = mode
@@ -48,6 +53,7 @@ class ConnectFour:
             raise ValueError("Invalid move")
 
     def undo_move(self, column: int) -> None:
+        """Remove the topmost disc from a given column."""
         for row in range(ROWS):
             if self.board[row][column] != 0:
                 self.board[row][column] = 0
@@ -96,22 +102,19 @@ class ConnectFour:
         return [i for i in range(COLUMNS) if self.board[0][i] == 0]
 
     def get_state(self) -> tuple[tuple[int, ...], ...]:
-        """
-        Return the 2d list numerical representation of the board
-        """
+        """Return the numerical board representation as immutable tuples."""
         result = tuple(tuple(x) for x in self.board)
 
         return result
 
     def get_prev_state(self) -> tuple[tuple[int, ...], ...] | None:
-        """
-        Return the previous state of the board
-        """
+        """Return the previous board state if available."""
         result = tuple(tuple(x) for x in self.previous_state)
 
         return result
 
     def play(self) -> None:
+        """Run the interactive game loop until completion."""
         while not self.game_over():
             self.display_board()
             possible_moves = self.get_possible_moves()
@@ -144,6 +147,7 @@ class ConnectFour:
 
 
 def main() -> None:
+    """CLI entry point to start a Connect Four game."""
     mode = input("Enter '0' for computer against computer, '1' to play against the computer, '2' to play against "
                  "another player: ")
     if mode == '0' or mode == '1' or mode == '2':
