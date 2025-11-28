@@ -1,14 +1,20 @@
+"""Unit tests for Connect Four game mechanics."""
+
 import unittest
 import numpy as np
 from src.game import *
 
 class TestConnectFour(unittest.TestCase):
+    """Validate core gameplay behaviors."""
+
     def test_init_game(self):
+        """Players are initialized with correct colors."""
         game = ConnectFour(0)
         self.assertEqual(game.player1.color, RED)
         self.assertEqual(game.player2.color, YELLOW)
 
     def test_make_move(self):
+        """Discs are placed in the correct row for successive moves."""
         game = ConnectFour(0)
         board = np.zeros((ROWS, COLUMNS), dtype=int)
         self.assertEqual(game.current_player.color, RED)
@@ -23,6 +29,7 @@ class TestConnectFour(unittest.TestCase):
         np.testing.assert_array_equal(game.board, board)
 
     def test_invalid_column_range(self):
+        """Column validity rejects out-of-range indices."""
         game = ConnectFour(0)
         self.assertTrue(game.is_column_valid(3))
         self.assertTrue(game.is_column_valid(0))
@@ -31,6 +38,7 @@ class TestConnectFour(unittest.TestCase):
         self.assertFalse(game.is_column_valid(COLUMNS))
 
     def test_invalid_column_full(self):
+        """Column validity rejects a full column."""
         game = ConnectFour(0)
         column = 1
         for row in range(ROWS):
@@ -39,6 +47,7 @@ class TestConnectFour(unittest.TestCase):
         self.assertFalse(game.is_column_valid(column))
 
     def test_undo_move(self):
+        """Undo restores the previous empty state."""
         game = ConnectFour(0)
         board = np.zeros((ROWS, COLUMNS), dtype=int)
         column = 1
@@ -47,18 +56,21 @@ class TestConnectFour(unittest.TestCase):
         np.testing.assert_array_equal(game.board, board)
 
     def test_check_winner_horizontal(self):
+        """Detect horizontal connect-four sequences."""
         game = ConnectFour(0)
         self.assertFalse(game.check_winner())
         game.board[0][0] = game.board[0][1] = game.board[0][2] = game.board[0][3] = 1
         self.assertTrue(game.check_winner())
 
     def test_check_winner_vertical(self):
+        """Detect vertical connect-four sequences."""
         game = ConnectFour(0)
         self.assertFalse(game.check_winner())
         game.board[0][0] = game.board[1][0] = game.board[2][0] = game.board[3][0] = 1
         self.assertTrue(game.check_winner())
 
     def test_check_winner_diagonal(self):
+        """Detect both diagonal connect-four sequences."""
         game = ConnectFour(0)
         self.assertFalse(game.check_winner())
         game.board[0][0] = game.board[1][1] = game.board[2][2] = game.board[3][3] = 1

@@ -1,9 +1,14 @@
+"""Unit tests for minimax heuristic scoring functions."""
+
 import unittest
 from src.game import *
 
 
 class TestMinimax(unittest.TestCase):
+    """Check heuristic scoring counts for patterns."""
+
     def test_count_horizontal_score(self):
+        """Score increases for horizontal pairs and fours."""
         game = ConnectFour(0)
         for col in range(1, 3):
             game.board[0][col] = 1
@@ -16,6 +21,7 @@ class TestMinimax(unittest.TestCase):
                          TWO_IN_A_ROW_SCORE)
 
     def test_count_vertical_score(self):
+        """Score increases for vertical pairs and fours."""
         game = ConnectFour(0)
         for row in range(1, 3):
             game.board[row][0] = 1
@@ -27,6 +33,7 @@ class TestMinimax(unittest.TestCase):
         self.assertEqual(FOUR_IN_A_ROW_SCORE + THREE_IN_A_ROW_SCORE + TWO_IN_A_ROW_SCORE, count_vertical_score(game, 1))
 
     def test_count_diagonal_score(self):
+        """Score increases for diagonal two-in-a-row patterns."""
         game = ConnectFour(0)
         game.board[2][0] = 1
         game.board[3][1] = 1
