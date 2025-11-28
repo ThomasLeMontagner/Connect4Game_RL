@@ -1,18 +1,24 @@
+from __future__ import annotations
+
 import time
 from copy import deepcopy
+from typing import TYPE_CHECKING
 import numpy as np
 from src.constants import *
 import math
 
-max_depth = 4 # maximum authorized depth
-max_time = 0.05 # maximum computation time
+if TYPE_CHECKING:
+    from src.game import ConnectFour
+
+max_depth: int = 4  # maximum authorized depth
+max_time: float = 0.05  # maximum computation time
 
 # define some constants for the heuristic evaluation
 TWO_IN_A_ROW_SCORE = 100
 THREE_IN_A_ROW_SCORE = 1000
 FOUR_IN_A_ROW_SCORE = 10000
 
-def minimize(game, current_depth, alpha, beta):
+def minimize(game: ConnectFour, current_depth: int, alpha: float, beta: float) -> float:
     #print(" -- minimize --")
     if game.check_winner() or current_depth == 0:
         # return a heuristic score for the current board state
@@ -21,7 +27,7 @@ def minimize(game, current_depth, alpha, beta):
     minUtility = math.inf
 
     for child in get_next_games(game):
-        utility = maximize(child, current_depth +1, alpha, beta)
+        utility = maximize(child, current_depth + 1, alpha, beta)
 
         if utility < minUtility:
             minUtility = utility
@@ -36,7 +42,7 @@ def minimize(game, current_depth, alpha, beta):
     return minUtility
 
 
-def maximize(game, current_depth, alpha, beta):
+def maximize(game: ConnectFour, current_depth: int, alpha: float, beta: float) -> float:
     #print(" -- maximize --")
     if game.check_winner() or current_depth == 0:
         # return a heuristic score for the current board state
@@ -65,12 +71,12 @@ def maximize(game, current_depth, alpha, beta):
     return maxUtility
 
 
-def decision(game):
+def decision(game: ConnectFour) -> float:
     # start = time.clock()
     return minimize(game, 0, -math.inf, math.inf)
 
 
-def evaluate_board(game):
+def evaluate_board(game: ConnectFour) -> float:
     """Evaluate the current board state and return a heuristic score."""
     score = 0
     player_color = game.current_player.color
@@ -97,10 +103,10 @@ def evaluate_board(game):
     # print('\n BOARD:')
     # print(game.board)
     # print(f"score: {score}")
-    return score
+    return float(score)
 
 
-def count_diagonal_score(game, color):
+def count_diagonal_score(game: ConnectFour, color: int) -> int:
     score = 0
     # from top left to bottom right
     for col in range(COLUMNS - 4 + 1):
@@ -116,7 +122,7 @@ def count_diagonal_score(game, color):
     return score
 
 
-def count_vertical_score(game, color):
+def count_vertical_score(game: ConnectFour, color: int) -> int:
     score = 0
     for col in range(COLUMNS):
         column = game.board[:, col]
@@ -126,7 +132,7 @@ def count_vertical_score(game, color):
     return score
 
 
-def count_horizontal_score(game, color):
+def count_horizontal_score(game: ConnectFour, color: int) -> int:
     score = 0
     for row in range(ROWS):
         r = game.board[row, :]
@@ -136,7 +142,7 @@ def count_horizontal_score(game, color):
     return score
 
 
-def add_scores(color, sub):
+def add_scores(color: int, sub: np.ndarray) -> int:
     score = 0
     if np.count_nonzero(sub == color) == 2 and np.count_nonzero(sub == 0) == 2:
         score += TWO_IN_A_ROW_SCORE
@@ -147,8 +153,8 @@ def add_scores(color, sub):
     return score
 
 
-def get_next_games(game):
-    games = []
+def get_next_games(game: ConnectFour) -> list[ConnectFour]:
+    games: list[ConnectFour] = []
     for col in range(COLUMNS):
         if game.is_column_valid(col):
             new_game = game.clone()
@@ -156,5 +162,4 @@ def get_next_games(game):
             game.switch_players()
             games.append(new_game)
     return games
-
 

@@ -1,14 +1,17 @@
-from random import random
+from __future__ import annotations
+
+import random
 
 import numpy as np
 from game import ConnectFour
 
 # create an empty dataset
-dataset = []
+DatasetEntry = tuple[np.ndarray, int]
+dataset: list[DatasetEntry] = []
 
 # simulate a large number of games
 for i in range(10000):
-    game = ConnectFour()
+    game = ConnectFour(mode='0')
     while True:
         # choose a random column to make a move in
         column = random.randint(0, 6)
@@ -27,5 +30,5 @@ for i in range(10000):
 # shuffle the dataset and split it into training and test sets
 random.shuffle(dataset)
 train_size = int(len(dataset) * 0.8)
-train_set = dataset[:train_size]
-test_set = dataset[train_size:]
+train_set: list[DatasetEntry] = dataset[:train_size]
+test_set: list[DatasetEntry] = dataset[train_size:]

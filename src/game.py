@@ -1,11 +1,16 @@
+from __future__ import annotations
+
+from copy import deepcopy
+
+import numpy as np
 from src.agent import *
 from src.constants import *
 
 class ConnectFour:
-    def __init__(self, mode):
-        self.board = np.zeros((ROWS, COLUMNS), dtype=int)  # initialize board with empty 0s
-        self.previous_state = None
-        self.mode = mode
+    def __init__(self, mode: str) -> None:
+        self.board: np.ndarray = np.zeros((ROWS, COLUMNS), dtype=int)  # initialize board with empty 0s
+        self.previous_state: tuple[tuple[int, ...], ...] | None = None
+        self.mode: str = mode
 
         if mode == '0':  # computer vs computer
             self.player1 = ComputerAgentMinimax(RED)
@@ -17,9 +22,9 @@ class ConnectFour:
             self.player1 = HumanAgent(RED)
             self.player2 = HumanAgent(YELLOW)
 
-        self.current_player = self.player1  # current player playing
+        self.current_player: AgentInterface = self.player1  # current player playing
 
-    def is_column_valid(self, column):
+    def is_column_valid(self, column: int) -> bool:
         """Check the validity of the column to make a move."""
         if not column in range(0, COLUMNS):
             # print(f"The column is out of range. It should be between 0 and {COLUMNS - 1}")
@@ -30,7 +35,7 @@ class ConnectFour:
         else:
             return True
 
-    def make_move(self, column, color=None):
+    def make_move(self, column: int, color: int | None = None) -> None:
         """Make a move by dropping a disc into the specified column and the specified color."""
         for row in range(5, -1, -1):  # start from bottom row and work upwards
             if self.board[row][column] == 0:
@@ -42,7 +47,7 @@ class ConnectFour:
         else:
             raise ValueError("Invalid move")
 
-    def undo_move(self, column):
+    def undo_move(self, column: int) -> None:
         for row in range(ROWS):
             if self.board[row][column] != 0:
                 self.board[row][column] = 0
@@ -50,14 +55,14 @@ class ConnectFour:
         else:
             raise ValueError("Invalid move: column is already empty")
 
-    def switch_player(self):
+    def switch_player(self) -> None:
         """Switch to the other player."""
         if self.current_player == self.player1:
             self.current_player = self.player2
         else:
             self.current_player = self.player1
 
-    def check_winner(self):
+    def check_winner(self) -> bool:
         """Check if the current player has won the game."""
         # check for horizontal wins
         for row in range(6):
@@ -82,15 +87,15 @@ class ConnectFour:
                     return True
         return False
 
-    def game_over(self):
+    def game_over(self) -> bool:
         """Check if the game is over (either because a player has won or the board is full)."""
         return self.check_winner() or all(self.board[0])
 
-    def get_possible_moves(self):
+    def get_possible_moves(self) -> list[int]:
         """Return list of non-full columns."""
         return [i for i in range(COLUMNS) if self.board[0][i] == 0]
 
-    def get_state(self):
+    def get_state(self) -> tuple[tuple[int, ...], ...]:
         """
         Return the 2d list numerical representation of the board
         """
@@ -98,7 +103,7 @@ class ConnectFour:
 
         return result
 
-    def get_prev_state(self):
+    def get_prev_state(self) -> tuple[tuple[int, ...], ...] | None:
         """
         Return the previous state of the board
         """
@@ -106,7 +111,7 @@ class ConnectFour:
 
         return result
 
-    def play(self):
+    def play(self) -> None:
         while not self.game_over():
             self.display_board()
             possible_moves = self.get_possible_moves()
@@ -129,7 +134,7 @@ class ConnectFour:
             self.display_board()
             print("Game over: it's a draw!")
 
-    def display_board(self):
+    def display_board(self) -> None:
         """Print the current state of the board to the console."""
         print('\n' + '-' * 13)
         for row in self.board:
@@ -138,7 +143,7 @@ class ConnectFour:
         print('-' * 13)
 
 
-def main():
+def main() -> None:
     mode = input("Enter '0' for computer against computer, '1' to play against the computer, '2' to play against "
                  "another player: ")
     if mode == '0' or mode == '1' or mode == '2':

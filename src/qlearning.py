@@ -1,8 +1,13 @@
+from __future__ import annotations
+
+from copy import deepcopy
+from typing import Sequence
+
 #from agent import *
 from game import *
 
 
-def train_qlearing_agent():
+def train_qlearing_agent() -> None:
     qplayer = ComputerAgentQLearning(color=1)  # Initialize the QPlayer object
     opponentPlayer = ComputerAgentRandom(2) # ComputerAgentMinimax(2)
 
@@ -18,7 +23,7 @@ def train_qlearing_agent():
         # Play the game
         while not game_over:
             # Get the player's move
-            actions = game.get_possible_moves()
+            actions: Sequence[int] = game.get_possible_moves()
             if game.current_player == 1:
                 # QPlayer
                 move = qplayer.get_move(game, actions)
